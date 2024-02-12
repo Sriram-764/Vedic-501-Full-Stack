@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Add Event</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        list-style: none;
+        text-decoration: none;
+        font-family: sans-serif;
+      }
+
+      input {
+        border-radius: 2px;
+        height: 20px;
+        width: 300px;
+        border: 1px solid black;
+        margin: 20px;
+        padding: 10px;
+      }
+
+      textarea {
+        border-radius: 2px;
+        height: 100px;
+        width: 300px;
+        border: 1px solid black;
+        margin: 20px;
+        padding: 10px;
+      }
+
+      textarea:focus {
+        outline: none;
+      }
+
+      input:focus {
+        outline: none;
+      }
+
+      nav ul {
+        display: flex;
+        float: right;
+      }
+
+      nav ul li a {
+        color: white;
+        margin: 10px;
+        padding: 5px;
+      }
+      nav {
+        background-color: green;
+        padding: 30px;
+      }
+
+      nav p {
+        color: white;
+        font-size: 20px;
+      }
+
+      nav ul li a:hover {
+        background-color: white;
+        color: black;
+        border-radius: 2px;
+      }
+
+      nav img {
+        height: 50px;
+        width: 50px;
+        border-radius: 50%;
+      }
+
+      span {
+        margin: 20px;
+      }
+
+      .container {
+        margin: 20px auto;
+        padding: 20px;
+      }
+
+      button {
+        padding: 10px;
+        width: 320px;
+        cursor: pointer;
+      }
+    </style>
+  </head>
+  <body>
+    <nav>
+      <p><img src="/images/logo.jpg" /><span>Sports Zone</span></p>
+      <ul>
+        <li><a href="/dashboard">Home</a></li>
+        <li><a href="/allEvents">All Events</a></li>
+        <li><a href="/logout">Logout</a></li>
+      </ul>
+    </nav>
+    <div class="container">
+      <form action="/addevent" method="post">
+        <p>
+          Image Url:
+          <input type="url" placeholder="Image Url" name="image" /><br />
+        </p>
+        <p>
+          Title of the Event:
+          <input type="text" placeholder="Event Title" name="title" /><br />
+        </p>
+        <p>Description of the event:</p>
+        <textarea placeholder="Event Description" name="desc"></textarea><br />
+        <p>
+          Event Location:
+          <input type="text" placeholder="Event Location" name="loc" /><br />
+        </p>
+        <p>
+          Members Capacity:
+          <input type="number" placeholder="Capacity" name="capacity" /><br />
+        </p>
+        <p>
+          Event Date:
+          <input type="date" placeholder="Event Date" name="eventDate" /><br />
+        </p>
+        <p>
+          Event Time:
+          <input type="time" placeholder="Event Time" name="time" /><br />
+        </p>
+        <p>
+          Event End Date:
+          <input
+            type="date"
+            placeholder="Event End Date"
+            name="endDate"
+          /><br />
+        </p>
+        <button type="submit">Add Event</button>
+      </form>
+    </div>
+  </body>
+</html>
