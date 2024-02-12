@@ -8,10 +8,8 @@ const { Pool } = require("pg");
 
 const authenticateUser = (request, response, next) => {
   if (request.session.user) {
-    // If user is authenticated, proceed to the next middleware
     next();
   } else {
-    // If user is not authenticated, redirect to login page
     response.redirect("/login");
   }
 };
