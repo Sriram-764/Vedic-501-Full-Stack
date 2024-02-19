@@ -56,7 +56,7 @@ app.post("/signup", async (request, response) => {
         email: request.body.Email,
         password: request.body.pass,
       });
-      return response.json(user);
+      response.redirect("/login");
     } else {
       return response
         .status(400)
@@ -74,13 +74,18 @@ app.post("/login", async (request, response) => {
       email: request.body.email,
       password: request.body.password,
     });
-    console.log("User Login Successfull");
-    request.session.user = {
-      id: user.id,
-      email: user.email,
-      fullname: user.fullname,
-    };
-    response.redirect("/dashboard");
+    if (!user) response.redirect("/login");
+    else {
+      console.log("User Login Successfull");
+      request.session.user = {
+        id: user.id,
+        email: user.email,
+        fullname: user.fullname,
+      };
+      if (user.email === "sriram123.boppe@gmail.com")
+        response.redirect("/adminDashboard");
+      else response.redirect("/dashboard");
+    }
   } catch (error) {
     console.log(error);
     return response.status(422).json(error);
@@ -92,18 +97,40 @@ app.get("/logout", (request, response) => {
   response.redirect("/login");
 });
 
-app.get("/dashboard", async (request, response) => {
+app.get("/adminDashboard", async (request, response) => {
   const { user } = request.session;
   if (!user) {
     return response.redirect("/login");
   }
-  console.log(user.fullname);
-  const events = await await Events.findAll({
+  const events = await Events.findAll({
     where: {
       eventUserId: user.id,
     },
   });
-  response.render("dashboard", { name: user.fullname, events });
+  response.render("adminDashboard", { name: user.fullname, events });
+});
+
+app.get("/dashboard", async (request, response) => {
+  console.log("Getting the dashboard");
+  const { user } = request.session;
+  const events = await eventRegisters.findAll({
+    where: {
+      userId: user.id,
+    },
+  });
+  let eventList = [];
+  for (const event of events) {
+    const details = await Events.findOne({
+      where: {
+        id: event.eventId,
+      },
+    });
+    if (details) {
+      eventList.push(details);
+      console.log(details.id); // Log the ID of each event
+    }
+  }
+  response.render("dashboard", { eventList });
 });
 
 app.get("/signup", (request, response) => {
@@ -111,9 +138,12 @@ app.get("/signup", (request, response) => {
 });
 
 app.get("/allEvents", async (request, response) => {
+  const { user } = request.session;
   try {
     const events = await Events.findAll();
-    response.render("allEvents", { events });
+    let link = "dashboard";
+    if (user.email === "sriram123.boppe@gmail.com") link = "adminDashboard";
+    response.render("allEvents", { events, link });
   } catch (error) {
     console.error(error);
     response.status(500).send("Internal Server Error");
@@ -145,13 +175,25 @@ app.post("/addEvent", authenticateUser, async (request, response) => {
 });
 
 app.get("/viewEvent/:id", async (request, response) => {
+  const { user } = request.session;
   const eventDetails = await Events.findOne({
     where: {
       id: request.params.id,
     },
   });
+  const eventid = eventDetails.id;
+  const yes = await eventRegisters.findOne({
+    where: {
+      userId: user.id,
+      eventId: eventid,
+    },
+  });
+  let registered = true;
+  if (yes) registered = false;
   console.log(request.params.id);
-  response.render("viewEvent", { eventDetails });
+  let flag = 0;
+  if (user.email === "sriram123.boppe@gmail.com") flag = 1;
+  response.render("viewEvent", { eventDetails, flag, registered });
 });
 
 app.get("/deleteEvent/:id", async (request, response) => {
@@ -162,6 +204,46 @@ app.get("/deleteEvent/:id", async (request, response) => {
   });
   console.log("Deleted Successfully");
   response.redirect("/allEvents");
+});
+
+app.get("/registeredMembers/:id", async (request, response) => {
+  const members = await eventRegisters.findAll({
+    where: {
+      id: request.params.id,
+    },
+  });
+  response.render("registeredMembers", { members });
+});
+
+app.get("/registerEvent/:eid", async (request, response) => {
+  try {
+    const { user } = request.session;
+    const member = await eventRegisters.create({
+      userId: user.id,
+      eventId: request.params.eid,
+    });
+    console.log("Registered to the event successfully");
+    response.redirect("/dashboard");
+  } catch (error) {
+    console.log("Internal error occured!");
+    response.status(400).json({ error: "Oops! Something went wrong!!" });
+  }
+});
+
+app.get("/unRegisterEvent/:eid", async (request, response) => {
+  try {
+    const { user } = request.session;
+    const event = await eventRegisters.destroy({
+      where: {
+        userId: user.id,
+        eventId: request.params.eid,
+      },
+    });
+    console.log("Deleted Successfully!");
+    response.redirect("/dashboard");
+  } catch (error) {
+    response.status(400).json({ error: "Oops! Something went wrong!!" });
+  }
 });
 
 app.listen(3000, () => {
