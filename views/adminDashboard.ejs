@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dashboard</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        list-style: none;
+        text-decoration: none;
+      }
+      body {
+        background-color: black;
+      }
+      nav ul {
+        display: flex;
+        float: right;
+      }
+
+      nav ul li a {
+        color: white;
+        margin: 10px;
+        padding: 5px;
+      }
+      nav {
+        background-color: green;
+        padding: 30px;
+      }
+
+      nav p {
+        color: white;
+        font-size: 20px;
+      }
+
+      nav ul li a:hover {
+        background-color: white;
+        color: black;
+        border-radius: 2px;
+      }
+
+      nav img {
+        height: 50px;
+        width: 50px;
+        border-radius: 50%;
+      }
+
+      span {
+        margin: 20px;
+      }
+
+      .container {
+        display: flex;
+      }
+
+      .event {
+        background-color: green;
+        text-align: center;
+        margin: 20px;
+        width: 300px;
+        padding: 20px 50px 20px 50px;
+      }
+
+      .event a:hover {
+        color: black;
+        background-color: white;
+        border-radius: 2px;
+        margin: 20px;
+      }
+
+      .event img {
+        height: 100px;
+        width: 100px;
+        margin: 10px;
+      }
+      .link a {
+        padding: 10px;
+        color: white;
+      }
+      .link {
+        color: white;
+        margin-top: 5px;
+        padding: 5px;
+      }
+
+      h2 {
+        font-size: 20px;
+        color: white;
+      }
+    </style>
+  </head>
+  <body>
+    <nav>
+      <p>
+        <img src="/images/logo.jpg" /><span
+          >Welcome to Sports Zone, <%= name %>!</span
+        >
+      </p>
+      <ul>
+        <li><a href="/allEvents">All Events</a></li>
+        <li><a href="/addEvent">Add Event</a></li>
+        <li><a href="/logout">Logout</a></li>
+      </ul>
+    </nav>
+    <div class="container">
+      <% events.forEach(event => { %>
+      <div class="event">
+        <h2>Title: <%= event.eventTitle %></h2>
+        <img src="<%= event.eventImg %>" /><br />
+        <div class="link">
+          <a href="/viewEvent/<%= event.id %>">Event Details</a> <br />
+        </div>
+        <div class="link">
+          <a href="/registeredMembers/<%= event.id %>">Event Participants</a>
+        </div>
+      </div>
+      <% })%>
+    </div>
+  </body>
+</html>

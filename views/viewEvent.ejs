@@ -95,8 +95,18 @@
       <p>Event End Date: <%= eventDetails.eventEndDate %></p>
     </div>
 
+    <% if(flag === 1) { %>
     <a href="/deleteEvent/<%= eventDetails.id %>">
       <button type="submit">Delete this Event</button>
     </a>
+    <% } else { if(registered) {%>
+    <a href="/registerEvent/<%= eventDetails.id %>">
+      <button type="submit">Register To this event</button>
+    </a>
+    <% } else { %>
+    <a href="/unRegisterEvent/<%= eventDetails.id %>">
+      <button type="submit">Unregister from this event</button>
+    </a>
+    <% } %> <% } %>
   </body>
 </html>
