@@ -6,9 +6,21 @@
     <title>Registered Members</title>
   </head>
   <body>
+    <nav>
+      <p>
+        <img src="/images/logo.jpg" /><span
+          >Welcome to Sports Zone, <%= name %>!</span
+        >
+      </p>
+      <ul>
+        <li><a href="/allEvents">All Events</a></li>
+        <li><a href="/addEvent">Add Event</a></li>
+        <li><a href="/logout">Logout</a></li>
+      </ul>
+    </nav>
     <div>
       <% members.forEach(member => { %>
-      <h1>member.id</h1>
+      <h1><%= member.userId %></h1>
       <% }) %>
     </div>
   </body>

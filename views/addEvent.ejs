@@ -88,6 +88,7 @@
     </style>
   </head>
   <body>
+    <input type="hidden" class="_csrf" value="<%= csrfToken %>" />
     <nav>
       <p><img src="/images/logo.jpg" /><span>Sports Zone</span></p>
       <ul>
@@ -97,7 +98,7 @@
       </ul>
     </nav>
     <div class="container">
-      <form action="/addevent" method="post">
+      <form action="/addEvent" method="post">
         <p>
           Image Url:
           <input type="url" placeholder="Image Url" name="image" /><br />

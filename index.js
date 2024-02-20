@@ -6,6 +6,9 @@ const bcrypt = require("bcrypt");
 const bodyParser = require("body-parser");
 const { Pool } = require("pg");
 
+var csrf = require("csurf");
+var cookieParser = require("cookie-parser");
+
 const authenticateUser = (request, response, next) => {
   if (request.session.user) {
     next();
@@ -35,37 +38,25 @@ app.use(
     saveUninitialized: true,
   })
 );
+app.use(cookieParser("This is a secrete String!!"));
+app.use(csrf({ cookie: true }));
 
 app.set("view engine", "ejs");
 app.set("views", "./views");
 
 app.get("/", (request, response) => {
-  response.render("login", { title: "Login" });
+  response.render("login", { title: "Login", csrfToken: request.csrfToken() });
 });
 
 app.get("/login", (request, response) => {
-  response.render("login", { title: "Login" });
+  response.render("login", { title: "Login", csrfToken: request.csrfToken() });
 });
 
-app.post("/signup", async (request, response) => {
-  console.log("Registering a user: ", request.body);
-  try {
-    if (request.body.pass === request.body.cPass) {
-      const user = await Registers.registerUser({
-        fullname: request.body.name,
-        email: request.body.Email,
-        password: request.body.pass,
-      });
-      response.redirect("/login");
-    } else {
-      return response
-        .status(400)
-        .json({ error: "Password and Confirm Password must be the same" });
-    }
-  } catch (error) {
-    console.log(error);
-    return response.status(422).json(error);
-  }
+app.get("/signup", (request, response) => {
+  response.render("signup", {
+    title: "SignUp",
+    csrfToken: request.csrfToken(),
+  });
 });
 
 app.post("/login", async (request, response) => {
@@ -92,6 +83,27 @@ app.post("/login", async (request, response) => {
   }
 });
 
+app.post("/signup", async (request, response) => {
+  console.log("Registering a user: ", request.body);
+  try {
+    if (request.body.pass === request.body.cPass) {
+      const user = await Registers.registerUser({
+        fullname: request.body.name,
+        email: request.body.Email,
+        password: request.body.pass,
+      });
+      response.redirect("/login");
+    } else {
+      return response
+        .status(400)
+        .json({ error: "Password and Confirm Password must be the same" });
+    }
+  } catch (error) {
+    console.log(error);
+    return response.status(422).json(error);
+  }
+});
+
 app.get("/logout", (request, response) => {
   console.log("user logged out successfully");
   response.redirect("/login");
@@ -107,7 +119,11 @@ app.get("/adminDashboard", async (request, response) => {
       eventUserId: user.id,
     },
   });
-  response.render("adminDashboard", { name: user.fullname, events });
+  response.render("adminDashboard", {
+    name: user.fullname,
+    events,
+    csrfToken: request.csrfToken(),
+  });
 });
 
 app.get("/dashboard", async (request, response) => {
@@ -127,14 +143,14 @@ app.get("/dashboard", async (request, response) => {
     });
     if (details) {
       eventList.push(details);
-      console.log(details.id); // Log the ID of each event
+      console.log(details.id);
     }
   }
-  response.render("dashboard", { eventList });
-});
-
-app.get("/signup", (request, response) => {
-  response.render("signup", { title: "SignUp" });
+  response.render("dashboard", {
+    name: user.fullname,
+    eventList,
+    csrfToken: request.csrfToken(),
+  });
 });
 
 app.get("/allEvents", async (request, response) => {
@@ -143,7 +159,11 @@ app.get("/allEvents", async (request, response) => {
     const events = await Events.findAll();
     let link = "dashboard";
     if (user.email === "sriram123.boppe@gmail.com") link = "adminDashboard";
-    response.render("allEvents", { events, link });
+    response.render("allEvents", {
+      events,
+      link,
+      csrfToken: request.csrfToken(),
+    });
   } catch (error) {
     console.error(error);
     response.status(500).send("Internal Server Error");
@@ -151,7 +171,7 @@ app.get("/allEvents", async (request, response) => {
 });
 
 app.get("/addEvent", authenticateUser, async (request, response) => {
-  response.render("addEvent");
+  response.render("addEvent", { csrfToken: request.csrfToken() });
 });
 
 app.post("/addEvent", authenticateUser, async (request, response) => {
@@ -167,7 +187,7 @@ app.post("/addEvent", authenticateUser, async (request, response) => {
       eventTime: request.body.time,
       eventEndDate: request.body.endDate,
     });
-    response.redirect("/allEvents");
+    response.render("/allEvents");
   } catch (err) {
     console.log(err);
     response.status(500).send("Internal Server Error");
@@ -206,12 +226,15 @@ app.get("/deleteEvent/:id", async (request, response) => {
   response.redirect("/allEvents");
 });
 
-app.get("/registeredMembers/:id", async (request, response) => {
+app.get("/registeredMembers/:eid", async (request, response) => {
   const members = await eventRegisters.findAll({
     where: {
-      id: request.params.id,
+      eventId: request.params.eid,
     },
   });
+
+  let memberList = [];
+
   response.render("registeredMembers", { members });
 });
 

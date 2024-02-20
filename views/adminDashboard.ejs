@@ -103,6 +103,7 @@
         <li><a href="/logout">Logout</a></li>
       </ul>
     </nav>
+    <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
     <div class="container">
       <% events.forEach(event => { %>
       <div class="event">

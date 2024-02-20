@@ -93,18 +93,13 @@
     </style>
   </head>
   <body>
+    <input type="hidden" class="_csrf" value="<%= csrfToken %>" />
     <nav>
       <p><img src="/images/logo.jpg" /><span>Sports Zone</span></p>
       <ul>
         <li><a href="/<%= link %>">Home</a></li>
         <li><a href="/logout">Logout</a></li>
       </ul>
-      <!-- <ul>
-        <li><a href="/dashboard">Home</a></li>
-        <li><a href="/allEvents">All Events</a></li>
-        <li><a href="/addEvent">Add Event</a></li>
-        <li><a href="/logout">Logout</a></li>
-      </ul> -->
     </nav>
     <div class="container">
       <% events.forEach(event => { %>
