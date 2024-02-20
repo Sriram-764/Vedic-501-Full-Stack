@@ -12,7 +12,7 @@
   </head>
   <body>
     <form action="/signup" method="post">
-      <input type="hidden" class="_csrf" value="<%= csrfToken %>" />
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
       <h1>Sign Up</h1>
       <input
         type="text"

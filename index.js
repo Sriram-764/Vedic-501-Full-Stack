@@ -159,11 +159,7 @@ app.get("/allEvents", async (request, response) => {
     const events = await Events.findAll();
     let link = "dashboard";
     if (user.email === "sriram123.boppe@gmail.com") link = "adminDashboard";
-    response.render("allEvents", {
-      events,
-      link,
-      csrfToken: request.csrfToken(),
-    });
+    response.render("allEvents", { events, link });
   } catch (error) {
     console.error(error);
     response.status(500).send("Internal Server Error");
@@ -187,7 +183,7 @@ app.post("/addEvent", authenticateUser, async (request, response) => {
       eventTime: request.body.time,
       eventEndDate: request.body.endDate,
     });
-    response.render("/allEvents");
+    response.redirect("/allEvents");
   } catch (err) {
     console.log(err);
     response.status(500).send("Internal Server Error");
@@ -227,6 +223,7 @@ app.get("/deleteEvent/:id", async (request, response) => {
 });
 
 app.get("/registeredMembers/:eid", async (request, response) => {
+  const { user } = request.session;
   const members = await eventRegisters.findAll({
     where: {
       eventId: request.params.eid,
@@ -234,8 +231,28 @@ app.get("/registeredMembers/:eid", async (request, response) => {
   });
 
   let memberList = [];
-
-  response.render("registeredMembers", { members });
+  for (const member of members) {
+    const details = await Registers.findOne({
+      where: {
+        id: member.userId,
+      },
+    });
+    if (details) {
+      memberList.push(details);
+      console.log(details.id);
+    }
+  }
+  const eventDetails = await Events.findOne({
+    where: {
+      id: request.params.eid,
+    },
+  });
+  response.render("registeredMembers", {
+    name: user.fullname,
+    members,
+    memberList,
+    eventDetails,
+  });
 });
 
 app.get("/registerEvent/:eid", async (request, response) => {
