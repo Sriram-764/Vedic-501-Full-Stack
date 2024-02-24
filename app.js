@@ -1,3 +1,5 @@
+/* eslint-disable no-undef */
+/* eslint-disable no-unused-vars */
 const express = require("express");
 const app = express();
 const { Registers, Events, eventRegisters } = require("./models");
@@ -5,6 +7,7 @@ const session = require("express-session");
 const bcrypt = require("bcrypt");
 const bodyParser = require("body-parser");
 const { Pool } = require("pg");
+const http = require("http");
 
 var csrf = require("csurf");
 var cookieParser = require("cookie-parser");
@@ -36,7 +39,7 @@ app.use(
     secret: "This_is_a_secret_key_2658752",
     resave: false,
     saveUninitialized: true,
-  })
+  }),
 );
 app.use(cookieParser("This is a secrete String!!"));
 app.use(csrf({ cookie: true }));
@@ -109,7 +112,7 @@ app.get("/logout", (request, response) => {
   response.redirect("/login");
 });
 
-app.get("/adminDashboard", async (request, response) => {
+app.get("/adminDashboard", authenticateUser, async (request, response) => {
   const { user } = request.session;
   if (!user) {
     return response.redirect("/login");
@@ -126,7 +129,7 @@ app.get("/adminDashboard", async (request, response) => {
   });
 });
 
-app.get("/dashboard", async (request, response) => {
+app.get("/dashboard", authenticateUser, async (request, response) => {
   console.log("Getting the dashboard");
   const { user } = request.session;
   const events = await eventRegisters.findAll({
@@ -153,7 +156,7 @@ app.get("/dashboard", async (request, response) => {
   });
 });
 
-app.get("/allEvents", async (request, response) => {
+app.get("/allEvents", authenticateUser, async (request, response) => {
   const { user } = request.session;
   try {
     const events = await Events.findAll();
@@ -190,7 +193,7 @@ app.post("/addEvent", authenticateUser, async (request, response) => {
   }
 });
 
-app.get("/viewEvent/:id", async (request, response) => {
+app.get("/viewEvent/:id", authenticateUser, async (request, response) => {
   const { user } = request.session;
   const eventDetails = await Events.findOne({
     where: {
@@ -212,7 +215,7 @@ app.get("/viewEvent/:id", async (request, response) => {
   response.render("viewEvent", { eventDetails, flag, registered });
 });
 
-app.get("/deleteEvent/:id", async (request, response) => {
+app.get("/deleteEvent/:id", authenticateUser, async (request, response) => {
   const events = await Events.destroy({
     where: {
       id: request.params.id,
@@ -222,40 +225,44 @@ app.get("/deleteEvent/:id", async (request, response) => {
   response.redirect("/allEvents");
 });
 
-app.get("/registeredMembers/:eid", async (request, response) => {
-  const { user } = request.session;
-  const members = await eventRegisters.findAll({
-    where: {
-      eventId: request.params.eid,
-    },
-  });
-
-  let memberList = [];
-  for (const member of members) {
-    const details = await Registers.findOne({
+app.get(
+  "/registeredMembers/:eid",
+  authenticateUser,
+  async (request, response) => {
+    const { user } = request.session;
+    const members = await eventRegisters.findAll({
       where: {
-        id: member.userId,
+        eventId: request.params.eid,
       },
     });
-    if (details) {
-      memberList.push(details);
-      console.log(details.id);
-    }
-  }
-  const eventDetails = await Events.findOne({
-    where: {
-      id: request.params.eid,
-    },
-  });
-  response.render("registeredMembers", {
-    name: user.fullname,
-    members,
-    memberList,
-    eventDetails,
-  });
-});
 
-app.get("/registerEvent/:eid", async (request, response) => {
+    let memberList = [];
+    for (const member of members) {
+      const details = await Registers.findOne({
+        where: {
+          id: member.userId,
+        },
+      });
+      if (details) {
+        memberList.push(details);
+        console.log(details.id);
+      }
+    }
+    const eventDetails = await Events.findOne({
+      where: {
+        id: request.params.eid,
+      },
+    });
+    response.render("registeredMembers", {
+      name: user.fullname,
+      members,
+      memberList,
+      eventDetails,
+    });
+  },
+);
+
+app.get("/registerEvent/:eid", authenticateUser, async (request, response) => {
   try {
     const { user } = request.session;
     const member = await eventRegisters.create({
@@ -270,20 +277,24 @@ app.get("/registerEvent/:eid", async (request, response) => {
   }
 });
 
-app.get("/unRegisterEvent/:eid", async (request, response) => {
-  try {
-    const { user } = request.session;
-    const event = await eventRegisters.destroy({
-      where: {
-        userId: user.id,
-        eventId: request.params.eid,
-      },
-    });
-    console.log("Deleted Successfully!");
-    response.redirect("/dashboard");
-  } catch (error) {
-    response.status(400).json({ error: "Oops! Something went wrong!!" });
-  }
-});
+app.get(
+  "/unRegisterEvent/:eid",
+  authenticateUser,
+  async (request, response) => {
+    try {
+      const { user } = request.session;
+      const event = await eventRegisters.destroy({
+        where: {
+          userId: user.id,
+          eventId: request.params.eid,
+        },
+      });
+      console.log("Deleted Successfully!");
+      response.redirect("/dashboard");
+    } catch (error) {
+      response.status(400).json({ error: "Oops! Something went wrong!!" });
+    }
+  },
+);
 
 module.exports = app;

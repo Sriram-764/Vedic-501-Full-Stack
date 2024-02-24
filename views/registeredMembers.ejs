@@ -8,75 +8,95 @@
       * {
         margin: 0;
         padding: 0;
-        list-style: none;
-        text-decoration: none;
-        font-family: sans-serif;
+        box-sizing: border-box;
+        font-family: Arial, sans-serif;
         color: white;
       }
       body {
-        background-color: black;
-      }
-      nav ul {
-        display: flex;
-        float: right;
-      }
-
-      nav ul li a {
-        color: white;
-        margin: 10px;
-        padding: 5px;
+        background-color: #121212;
       }
       nav {
-        background-color: green;
-        padding: 30px;
+        background-color: #1e824c;
+        padding: 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
       }
-
-      nav p {
-        color: white;
-        font-size: 20px;
-      }
-
-      nav ul li a:hover {
-        background-color: white;
-        color: black;
-        border-radius: 2px;
-      }
-
       nav img {
         height: 50px;
         width: 50px;
         border-radius: 50%;
+        margin-right: 10px;
       }
-
+      nav p {
+        color: white;
+        font-size: 20px;
+        display: flex;
+        align-items: center;
+      }
+      nav ul {
+        display: flex;
+        list-style-type: none;
+      }
+      nav ul li {
+        margin-left: 20px;
+      }
+      nav ul li a {
+        color: white;
+        text-decoration: none;
+        padding: 10px 20px;
+        border-radius: 5px;
+        transition: background-color 0.3s ease;
+      }
+      nav ul li a:hover {
+        background-color: #25a372;
+      }
       span {
         margin: 20px;
       }
-
       img {
         height: 100px;
         width: 100px;
         margin: 10px;
+        border-radius: 50%;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
       }
-
       h1 {
         margin: 20px;
+        font-size: 36px;
+        color: #fff;
+        text-align: center;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
       }
-
       table {
         margin: 20px auto;
         border-collapse: collapse;
-        width: 300px;
+        width: 80%;
+        max-width: 800px;
+        background-color: rgba(255, 255, 255, 0.1);
+        border-radius: 10px;
+        overflow: hidden;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
       }
-
       table tr th {
-        padding: 10px;
-        font-size: 25px;
-      }
-
-      table tr td {
-        font-size: 20px;
-        padding: 10px;
+        padding: 15px;
+        font-size: 24px;
+        color: #00e676;
         text-align: center;
+        border-bottom: 2px solid #00e676;
+      }
+      table tr td {
+        padding: 15px;
+        font-size: 20px;
+        text-align: center;
+        border-bottom: 1px solid #ddd;
+      }
+      table tr:last-child td {
+        border-bottom: none;
+      }
+      table tr:hover {
+        background-color: rgba(255, 255, 255, 0.2);
       }
     </style>
   </head>
