@@ -33,6 +33,16 @@ describe("Tests for sports scheduler", () => {
     server.close();
   });
 
+  test("should successfully access the home page", async () => {
+    const res = await agent.get("/");
+    expect(res.statusCode).toBe(200);
+  });
+
+  test("should successfully get login page", async () => {
+    const res = await agent.get("/login");
+    expect(res.statusCode).toBe(200);
+  });
+
   test("should successfully log in", async () => {
     let res = await agent.get("/login");
     const csrfToken = extractCsrfToken(res);
@@ -42,6 +52,11 @@ describe("Tests for sports scheduler", () => {
       _csrf: csrfToken,
     });
     expect(res.statusCode).toBe(302);
+  });
+
+  test("should successfully get sign up", async () => {
+    const res = await agent.get("/signup");
+    expect(res.statusCode).toBe(200);
   });
 
   test("should successfully sign up", async () => {
